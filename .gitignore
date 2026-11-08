@@ -1,0 +1,38 @@
+# Local secrets and private configuration
+.env
+.env.*
+!.env.example
+*.env
+*.env.*
+!*.env.example
+/config/
+application-local.*
+application-private.*
+application-secrets.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+credentials*.json
+*service-account*.json
+
+# Build output, local data, and editor state
+target/
+logs/
+data/
+uploads/
+backups/
+tmp/
+*.log
+*.dump
+*.sql.gz
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Server-specific operations that import existing private configuration
+/deploy/manage-release.py
+/deploy/verify-site.py

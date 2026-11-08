@@ -1,0 +1,59 @@
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: native
+
+spring:
+  application:
+    name: aicelery
+  # AI 非敏感配置随应用打包；API Key 通过环境变量注入。
+  config:
+    import: classpath:application-ai.yml
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/aicelery?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
+    username: ${DB_USERNAME:aicelery}
+    password: ${DB_PASSWORD}
+  flyway:
+    enabled: true
+    table: ${FLYWAY_TABLE:aicelery_schema_history}
+    baseline-on-migrate: true
+    baseline-version: 0
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  access-code: ${APP_ACCESS_CODE}
+  logging:
+    request-body-enabled: false
+    response-body-enabled: false
+    excluded-paths:
+      - /api/site-access
+      - /actuator/health
+    max-file-size: 20MB
+    max-history: 7
+    total-size-cap: 256MB
+  scheduler:
+    enabled: true
+    # 每一轮重新随机取值，让多实例的轮询时间自然错开。
+    min-poll-interval: 800ms
+    max-poll-interval: 1200ms
+    claim-batch-size: ${TASK_CONCURRENCY:4}
+    # 本实例的 Provider 并发槽位；Poller 先拿槽位，再按空闲数抢占。
+    max-concurrency: ${TASK_CONCURRENCY:4}
+    # 必须显著大于全局 120 秒调用超时，给结果回写留出余量。
+    lease-duration: 4m
+    recovery-interval: 30s
+    recovery-batch-size: 100
+    hard-max-attempts: 3

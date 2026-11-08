@@ -1,0 +1,18 @@
+app:
+  ai:
+    request-timeout: 120s
+    max-result-bytes: 1MB
+    providers:
+      deepseek:
+        enabled: ${DEEPSEEK_ENABLED:false}
+        base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+        api-key: ${DEEPSEEK_API_KEY:}
+        supported-models:
+          - ${DEEPSEEK_MODEL:deepseek-flash}
+          - deepseek-v4-pro
+      openai:
+        enabled: ${OPENAI_ENABLED:false}
+        base-url: https://api.openai.com
+        api-key: ${OPENAI_API_KEY:}
+        supported-models:
+          - gpt-5.6

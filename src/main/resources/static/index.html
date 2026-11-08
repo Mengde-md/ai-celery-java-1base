@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="智序 AI 任务中台，提交任务、查看执行进度与生成结果。">
+  <title>AICelery · 智序 AI 任务中台</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main id="access-panel" class="access-screen">
+    <form id="access-form" class="access-card">
+      <h1>请输入访问码</h1>
+      <label class="sr-only" for="access-code">访问码</label>
+      <input id="access-code" name="access-code" type="password" autocomplete="current-password" placeholder="请输入访问码" aria-describedby="access-error" required>
+      <button id="access-submit" class="button primary" type="submit">进入</button>
+      <p id="access-error" class="form-error" role="alert"></p>
+    </form>
+  </main>
+
+  <div id="application" hidden>
+    <header class="app-header">
+      <div class="header-inner">
+        <a class="brand" href="/" aria-label="AICelery 首页"><span class="brand-icon" aria-hidden="true">AI</span><span>AICelery<small>智序 AI 任务中台</small></span></a>
+        <span class="provider-badge"><span class="dot"></span>DeepSeek</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <div class="page-heading"><div><p class="eyebrow">让想法有序发生</p><h1>提交任务，等待灵感落地。</h1><p class="page-description">选择模型，写下你的需求，进度与结果会自动更新。</p></div></div>
+      <div class="workspace">
+        <section class="card composer-card" aria-labelledby="create-heading">
+          <div class="card-heading"><h2 id="create-heading">新建任务</h2><span class="small-label">文本生成</span></div>
+          <form id="task-form">
+            <label for="model">模型</label>
+            <select id="model" name="model"><option value="deepseek-flash">DeepSeek Flash</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select>
+            <div class="label-row"><label for="prompt">任务内容</label><span id="prompt-count" class="field-hint">0 / 60000</span></div>
+            <textarea id="prompt" name="prompt" rows="7" maxlength="60000" placeholder="例如：帮我把这段思路整理成一份清晰的行动计划……" required></textarea>
+            <details class="advanced"><summary>高级选项</summary><label for="system-prompt">系统提示词 <span class="field-hint">可选</span></label><textarea id="system-prompt" name="system-prompt" rows="3" maxlength="10000" placeholder="设定角色、表达方式或输出要求"></textarea><label for="max-tokens">最大输出 Token</label><input id="max-tokens" name="max-tokens" type="number" min="1" max="8000" step="1" value="2000" required></details>
+            <p id="submit-error" class="form-error" role="alert"></p>
+            <button id="submit-task" class="button primary submit-task" type="submit"><span>创建任务</span><span aria-hidden="true">↗</span></button>
+            <p class="form-note">任务会在后台执行，你可以继续提交新的任务。</p>
+          </form>
+        </section>
+
+        <section class="card result-card" aria-labelledby="result-heading">
+          <div class="card-heading result-heading"><div><h2 id="result-heading">任务结果</h2><p id="task-id" class="task-id">选择或创建一个任务</p></div><span id="task-status" class="status neutral" role="status">等待任务</span></div>
+          <dl class="task-metrics"><div><dt>使用模型</dt><dd id="task-model">—</dd></div><div><dt>任务用时</dt><dd id="task-duration">—</dd></div><div><dt>Token 总量</dt><dd id="task-total">—</dd></div></dl>
+          <div id="poll-warning" class="notice warning" role="status" hidden>连接暂时中断，正在重新获取进度……</div>
+          <div id="task-error" class="notice failure" hidden><strong>执行提示</strong><p id="task-error-message"></p></div>
+          <div id="result-placeholder" class="result-placeholder"><div class="placeholder-icon" aria-hidden="true">✦</div><h3 id="placeholder-heading">结果将在这里显示</h3><p id="placeholder-description">提交第一个任务，或选择一条最近记录。</p></div>
+          <pre id="result-text" class="result-text" tabindex="0" aria-label="生成结果" hidden></pre>
+          <div id="task-details" class="task-details" hidden><span>输入 <strong id="input-tokens">0</strong></span><span>输出 <strong id="output-tokens">0</strong></span><span id="task-attempts"></span></div>
+          <div class="result-actions"><span id="task-time" class="field-hint"></span><div><button id="copy-result" class="button secondary" type="button" disabled>复制结果</button><button id="cancel-task" class="button danger" type="button" hidden>取消任务</button></div></div>
+          <p id="cancel-note" class="cancel-note" hidden>取消会停止后续结果回写；已经发出的模型请求可能仍在执行。</p>
+        </section>
+
+        <section class="card recent-card" aria-labelledby="recent-heading">
+          <div class="card-heading"><h2 id="recent-heading">最近任务 <span id="recent-count" class="count">0</span></h2><button id="refresh-recent" class="text-button" type="button">刷新</button></div>
+          <div id="recent-tasks" class="recent-tasks"><p class="recent-empty">还没有任务记录</p></div>
+          <p class="recent-note">此处展示当前浏览器最近提交的任务。</p>
+        </section>
+      </div>
+    </main>
+    <footer class="app-footer">AICelery · 把每一个想法，变成下一步。</footer>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
