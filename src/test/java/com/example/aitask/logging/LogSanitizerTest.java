@@ -1,0 +1,25 @@
+package com.example.aitask.logging;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+class LogSanitizerTest {
+    @ParameterizedTest
+    @ValueSource(strings = {"password", "apiKey", "api_key", "authorization", "accessToken", "refreshToken"})
+    void masksTheEntireSensitiveValueIncludingEscapedQuotes(String field) {
+        String value = "{\"" + field + "\":\"prefix\\\"private-suffix\\\\end\",\"message\":\"public\"}";
+
+        assertThat(LogSanitizer.sanitize(value, 1000))
+                .isEqualTo("{\"" + field + "\":\"***\",\"message\":\"public\"}");
+    }
+
+    @Test
+    void preservesEscapedQuotesInNonSensitiveFields() {
+        String value = "{\"message\":\"public\\\"text\\\\end\"}";
+
+        assertThat(LogSanitizer.sanitize(value, 1000)).isEqualTo(value);
+    }
+}
