@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 public final class LogSanitizer {
     private static final Pattern SENSITIVE_JSON = Pattern.compile(
             "(?i)(\"(?:password|apiKey|api_key|authorization|accessToken|refreshToken)\"\\s*:\\s*\")"
-                    + "(?:\\\\.|[^\"\\\\])*(\")");
+                    + "(?:\\\\.|[^\"\\\\])*+(\")");
     private static final Pattern LINE_BREAK = Pattern.compile("[\\r\\n]+");
 
     private LogSanitizer() {

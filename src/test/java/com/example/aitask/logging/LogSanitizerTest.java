@@ -17,6 +17,13 @@ class LogSanitizerTest {
     }
 
     @Test
+    void masksLongSensitiveValuesWithoutOverflow() {
+        String value = "{\"apiKey\":\"" + "a".repeat(20000) + "\"}";
+
+        assertThat(LogSanitizer.sanitize(value, 1000)).isEqualTo("{\"apiKey\":\"***\"}");
+    }
+
+    @Test
     void preservesEscapedQuotesInNonSensitiveFields() {
         String value = "{\"message\":\"public\\\"text\\\\end\"}";
 
