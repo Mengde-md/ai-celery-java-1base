@@ -24,6 +24,12 @@ class LogSanitizerTest {
     }
 
     @Test
+    void marksLineBreaksWithoutSplittingLogRecords() {
+        assertThat(LogSanitizer.sanitize("first\r\nsecond\nthird", 1000))
+                .isEqualTo("first\\nsecond\\nthird");
+    }
+
+    @Test
     void preservesEscapedQuotesInNonSensitiveFields() {
         String value = "{\"message\":\"public\\\"text\\\\end\"}";
 

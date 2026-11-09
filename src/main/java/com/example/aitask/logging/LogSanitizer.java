@@ -1,5 +1,6 @@
 package com.example.aitask.logging;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** 日志正文脱敏、单行化和截断工具，防止密钥泄露及单条日志无限膨胀。 */
@@ -18,7 +19,7 @@ public final class LogSanitizer {
             return "";
         }
         String masked = SENSITIVE_JSON.matcher(value).replaceAll("$1***$2");
-        String singleLine = LINE_BREAK.matcher(masked).replaceAll("\\n");
+        String singleLine = LINE_BREAK.matcher(masked).replaceAll(Matcher.quoteReplacement("\\n"));
         if (singleLine.length() <= maxChars) {
             return singleLine;
         }
