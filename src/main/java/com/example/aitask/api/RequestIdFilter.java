@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -15,13 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * 为每个 HTTP 请求维护 Request ID，并写入响应头和日志 MDC。
  *
- * <p>调用方传入 ID 时沿用；未传时由服务端生成。finally 中必须清理 MDC，
+ * <p>调用方传入格式有效的 ID 时沿用，否则由服务端生成。finally 中必须清理 MDC，
  * 否则线程复用时可能把上一个请求的标识带到下一条日志。</p>
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestIdFilter extends OncePerRequestFilter {
     public static final String HEADER = "X-Request-Id";
+    private static final Pattern REQUEST_ID = Pattern.compile("[A-Za-z0-9._:-]{1,128}");
 
     /** 为单次请求建立并在结束后清理 Request ID 上下文。 */
     @Override
@@ -29,7 +31,7 @@ public class RequestIdFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String requestId = request.getHeader(HEADER);
-        if (requestId == null || requestId.isBlank()) {
+        if (requestId == null || !REQUEST_ID.matcher(requestId).matches()) {
             requestId = UUID.randomUUID().toString();
         }
         response.setHeader(HEADER, requestId);
