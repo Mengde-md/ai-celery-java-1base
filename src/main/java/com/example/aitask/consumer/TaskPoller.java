@@ -64,6 +64,9 @@ public class TaskPoller {
 
     /** 执行一次“申请槽位 → 抢占 → 异步执行”，结束后安排下一次随机轮询。 */
     void poll() {
+        if (stopped.get()) {
+            return;
+        }
         int reserved = 0;
         try {
             // 先占用本地并发槽位，再按槽位数抢任务，避免任务已 RUNNING 却在本机排队。
@@ -141,7 +144,7 @@ public class TaskPoller {
         stop();
     }
 
-    /** 停机后阻止新的轮询被调度；已提交任务由执行器生命周期管理。 */
+    /** 停机后跳过尚未开始的轮询；已提交任务由执行器生命周期管理。 */
     @PreDestroy
     public void stop() {
         stopped.set(true);
