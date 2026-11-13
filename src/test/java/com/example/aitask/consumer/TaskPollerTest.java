@@ -1,16 +1,28 @@
 package com.example.aitask.consumer;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import com.example.aitask.config.SchedulerProperties;
 import com.example.aitask.storage.AiTaskRepository;
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.TaskScheduler;
 
 class TaskPollerTest {
+    @Test
+    void rejectsPollingIntervalsThatWouldRoundDownToZero() {
+        for (Duration minimum : List.of(Duration.ofMillis(-1), Duration.ZERO, Duration.ofNanos(1))) {
+            assertThatThrownBy(() -> new SchedulerProperties(true, minimum, null, 1, 1, null, null, 1, 1))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("min-poll-interval must be at least 1 ms");
+        }
+    }
+
     @Test
     void queuedPollDoesNotClaimTasksAfterStop() {
         SchedulerProperties properties = new SchedulerProperties(true, null, null, 1, 1, null, null, 1, 1);
