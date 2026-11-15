@@ -28,6 +28,12 @@ Java / Spring Boot 不会自动加载 .env，需要在启动进程的环境变�
 
 访问码通过 APP_ACCESS_CODE 注入。空访问码会关闭接口的访问码校验，部署时应提供强访问码。模型调用已经发出后，逻辑取消不保证立即中断上游请求。
 
+## 调度与租约
+
+默认配置每轮在 800 到 1200 毫秒之间随机等待。调整 `app.scheduler.min-poll-interval` 时，最小值必须至少为 1 毫秒，且不能超过 `app.scheduler.max-poll-interval`。`TASK_CONCURRENCY` 默认为 4，控制每个实例的并发槽位和单次最多领取的任务数。
+
+`app.scheduler.lease-duration` 默认为 4 分钟，应为模型调用和结果写回留出时间。工作进程退出后，恢复任务默认每 30 秒检查一次过期租约。
+
 ## 请求追踪
 
 调用方可以在 HTTP 请求中提供 `X-Request-Id`，用于关联 API 响应和服务端日志。ID 长度为 1 到 128 个字符，只允许 ASCII 字母、数字及 `.`、`_`、`:`、`-`。省略请求头或值不符合规则时，服务端会生成 UUID。排查问题时请记录响应头中的 `X-Request-Id`。
