@@ -24,6 +24,15 @@ class TaskPollerTest {
     }
 
     @Test
+    void rejectsNonpositiveTaskLeases() {
+        for (Duration lease : List.of(Duration.ZERO, Duration.ofSeconds(-1))) {
+            assertThatThrownBy(() -> new SchedulerProperties(true, null, null, 1, 1, lease, null, 1, 1))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("lease-duration must be positive");
+        }
+    }
+
+    @Test
     void queuedPollDoesNotClaimTasksAfterStop() {
         SchedulerProperties properties = new SchedulerProperties(true, null, null, 1, 1, null, null, 1, 1);
         AiTaskRepository repository = mock(AiTaskRepository.class);

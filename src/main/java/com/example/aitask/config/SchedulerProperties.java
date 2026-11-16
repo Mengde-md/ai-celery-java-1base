@@ -32,6 +32,9 @@ public record SchedulerProperties(
         recoveryBatchSize = recoveryBatchSize <= 0 ? 100 : recoveryBatchSize;
         // V1 的硬上限为 3，配置不能绕过该边界无限重试。
         hardMaxAttempts = hardMaxAttempts <= 0 ? 3 : Math.min(hardMaxAttempts, 3);
+        if (leaseDuration.isZero() || leaseDuration.isNegative()) {
+            throw new IllegalArgumentException("lease-duration must be positive");
+        }
         if (minPollInterval.compareTo(Duration.ofMillis(1)) < 0) {
             throw new IllegalArgumentException("min-poll-interval must be at least 1 ms");
         }
