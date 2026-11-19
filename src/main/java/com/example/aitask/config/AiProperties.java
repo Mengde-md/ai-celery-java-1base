@@ -22,6 +22,9 @@ public record AiProperties(
     public AiProperties {
         // 构造器默认值保证单元测试或局部配置缺失时仍遵守 V1 安全边界。
         requestTimeout = requestTimeout == null ? Duration.ofSeconds(120) : requestTimeout;
+        if (requestTimeout.isZero() || requestTimeout.isNegative()) {
+            throw new IllegalArgumentException("request-timeout must be positive");
+        }
         maxResultBytes = maxResultBytes == null ? DataSize.ofMegabytes(1) : maxResultBytes;
         providers = providers == null ? Map.of() : Map.copyOf(providers);
     }
