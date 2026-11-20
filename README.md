@@ -32,6 +32,8 @@ Java / Spring Boot 不会自动加载 .env，需要在启动进程的环境变�
 
 提交任务时选择的 `provider` 和 `model` 会随任务保存。执行时，工作进程按已保存的厂商名称选择已启用的适配器，模型名称也沿用提交时的值。处理队列积压时，执行实例需要继续启用这些任务所选的厂商。找不到对应适配器时，任务会以不可重试的 `INVALID_TASK_PAYLOAD` 失败。
 
+模型调用成功后，服务按结果正文的 UTF-8 字节数检查 `app.ai.max-result-bytes`，默认上限为 1 MiB（1,048,576 字节）。正好达到上限的正文可以保存。超出上限时，任务以 `RESULT_TOO_LARGE` 失败，调度器不会自动重试。排查中文或含表情的长结果时，应按 UTF-8 编码后的大小估算。
+
 ## 调度与租约
 
 默认配置每轮在 800 到 1200 毫秒之间随机等待。调整 `app.scheduler.min-poll-interval` 时，最小值必须至少为 1 毫秒，且不能超过 `app.scheduler.max-poll-interval`。`TASK_CONCURRENCY` 默认为 4，控制每个实例的并发槽位和单次最多领取的任务数。
