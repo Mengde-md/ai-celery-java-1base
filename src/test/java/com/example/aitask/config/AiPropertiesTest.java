@@ -6,8 +6,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.unit.DataSize;
 
 class AiPropertiesTest {
+    @Test
+    void rejectsNegativeResultLimitsAndAcceptsZero() {
+        assertThatThrownBy(() -> new AiProperties(null, DataSize.ofBytes(-1), null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("max-result-bytes");
+        assertThat(new AiProperties(null, DataSize.ofBytes(0), null).maxResultBytes().toBytes()).isZero();
+    }
+
     @Test
     void rejectsNonpositiveRequestTimeouts() {
         for (Duration timeout : List.of(Duration.ZERO, Duration.ofSeconds(-1))) {

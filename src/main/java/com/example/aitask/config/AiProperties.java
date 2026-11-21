@@ -26,6 +26,9 @@ public record AiProperties(
             throw new IllegalArgumentException("request-timeout must be positive");
         }
         maxResultBytes = maxResultBytes == null ? DataSize.ofMegabytes(1) : maxResultBytes;
+        if (maxResultBytes.isNegative()) {
+            throw new IllegalArgumentException("max-result-bytes must not be negative");
+        }
         providers = providers == null ? Map.of() : Map.copyOf(providers);
     }
 
