@@ -28,6 +28,12 @@ Java / Spring Boot 不会自动加载 .env，需要在启动进程的环境变�
 
 访问码通过 APP_ACCESS_CODE 注入。空访问码会关闭接口的访问码校验，部署时应提供强访问码。
 
+## 提交与查询任务
+
+`POST /api/v1/tasks` 成功后，服务已保存任务。客户端应保存响应中的 `data.taskId`，使用 `GET /api/v1/tasks/{taskId}` 轮询，直到状态变为 `SUCCEEDED`、`FAILED` 或 `CANCELLED`。
+
+每次成功提交都会生成新的任务 ID。即使沿用相同的 `X-Request-Id`，再次发送创建请求也可能触发第二次模型调用。已取得任务 ID 时，轮询超时后应使用该 ID 重试查询。
+
 ## 取消任务
 
 调用 `POST /api/v1/tasks/{taskId}/cancel` 后，先检查响应中的业务码 `code`。成功时 `code` 为 `0`，`data.status` 表示任务的最终状态。待执行或执行中的任务取消成功后返回 `CANCELLED`。如果任务已经进入 `SUCCEEDED`、`FAILED` 或 `CANCELLED`，重复取消会返回已有状态。任务不存在时，业务码为 `20006`。
