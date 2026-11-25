@@ -58,6 +58,8 @@ Java / Spring Boot 不会自动加载 .env，需要在启动进程的环境变�
 
 调用方可以在 HTTP 请求中提供 `X-Request-Id`，用于关联 API 响应和服务端日志。ID 长度为 1 到 128 个字符，只允许 ASCII 字母、数字及 `.`、`_`、`:`、`-`。省略请求头或值不符合规则时，服务端会生成 UUID。排查问题时请记录响应头中的 `X-Request-Id`。
 
+`app.logging.request-body-enabled` 和 `app.logging.response-body-enabled` 默认均为 `false`。前者同时控制 HTTP 请求正文、系统提示词和用户提示词的日志记录，后者同时控制 HTTP 响应正文和模型输出。排查慢任务时，可以先用 `taskId` 查找 `LLM_RESPONSE` 日志中的模型名称和耗时 `costMs`。
+
 ## 配置隔离
 
 API Key、数据库密码与访问码通过运行环境提供。仓库仅包含空值或占位值的示例文件。.env、config/、私钥、证书、日志、上传文件、备份和构建产物由 .gitignore 排除。
